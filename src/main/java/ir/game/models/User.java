@@ -2,6 +2,7 @@ package ir.game.models;
 
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity
@@ -19,8 +20,9 @@ public class User {
 
     private String lastName;
 
+    private LocalDateTime lastRequest;
     @ManyToMany
-    private List<User> users;
+    private List<User> friends;
 
     @ManyToOne
     private Role role;
@@ -52,12 +54,12 @@ public class User {
         this.lastName = lastName;
     }
 
-    public List<User> getUsers() {
-        return users;
+    public List<User> getFriends() {
+        return friends;
     }
 
-    public void setUsers(List<User> users) {
-        this.users = users;
+    public void setFriends(List<User> friends) {
+        this.friends = friends;
     }
 
     public String getUsername() {
@@ -82,5 +84,13 @@ public class User {
 
     public void setRole(Role role) {
         this.role = role;
+    }
+
+    public LocalDateTime getLastRequest() {
+        return lastRequest;
+    }
+
+    public void setLastRequest(LocalDateTime lastRequest) {
+        this.lastRequest = lastRequest;
     }
 }

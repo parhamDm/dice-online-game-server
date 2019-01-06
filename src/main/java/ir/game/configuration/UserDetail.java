@@ -1,5 +1,6 @@
 package ir.game.configuration;
 
+import ir.game.models.Role;
 import ir.game.models.User;
 import ir.game.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,10 @@ public class UserDetail{
 
         if (user == null) {
             throw new UsernameNotFoundException("User '" + username + "' not found");
+        }
+
+        if(user.getRole()==null){
+            user.setRole(new Role("ROLE_GUEST"));
         }
 
         return org.springframework.security.core.userdetails.User//

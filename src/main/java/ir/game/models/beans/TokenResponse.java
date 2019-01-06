@@ -7,6 +7,7 @@ public class TokenResponse {
     private String username;
 
     private String Role;
+    private String errorMsg;
 
     public String getUsername() {
         return username;
@@ -30,5 +31,13 @@ public class TokenResponse {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public String getErrorMsg() {
+        return errorMsg;
+    }
+
+    public void setErrorMsg(String errorMsg) {
+        this.errorMsg = errorMsg;
     }
 }

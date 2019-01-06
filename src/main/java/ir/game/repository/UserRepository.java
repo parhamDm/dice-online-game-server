@@ -6,4 +6,5 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface UserRepository extends JpaRepository<User, Long> {
     User findFirstByUsername(String username);
+    User findFirstByUsernameAndPassword(String username,String password);
 }
