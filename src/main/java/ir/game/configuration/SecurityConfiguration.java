@@ -40,10 +40,12 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .antMatchers("/user/signup").permitAll()//
                 .antMatchers("/user/login").permitAll()//
                 .antMatchers("/h2-console/**/**").permitAll()
+                .antMatchers("/user/uploadPix").permitAll()
+                .antMatchers("/game/create").hasRole("normal-user")
                 .antMatchers(HttpMethod.OPTIONS,"/*").permitAll()
 
                 // Disallow everything else..
-                .anyRequest().hasRole("normal-user");
+                .anyRequest().permitAll();
 
         // If a user try to access a resource without having enough permissions
         http.exceptionHandling().accessDeniedPage("/login");

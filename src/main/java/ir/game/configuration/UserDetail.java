@@ -24,6 +24,8 @@ public class UserDetail{
 
         if(user.getRole()==null){
             user.setRole(new Role("ROLE_GUEST"));
+        }else{
+            user.getRole().setRoleName("ROLE_"+(user.getRole().getRoleName()));
         }
 
         return org.springframework.security.core.userdetails.User//

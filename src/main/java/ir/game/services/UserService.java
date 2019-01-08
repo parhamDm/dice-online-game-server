@@ -1,16 +1,21 @@
 package ir.game.services;
 
 import ir.game.configuration.JwtTokenProvider;
+import ir.game.models.ProfilePicture;
 import ir.game.models.Role;
 import ir.game.models.User;
 import ir.game.models.beans.TokenResponse;
 import ir.game.models.beans.UserRegisterForm;
+import ir.game.repository.ProfilePictureRepository;
 import ir.game.repository.RoleRepository;
 import ir.game.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -24,11 +29,15 @@ public class UserService {
 
     @Autowired
     RoleRepository roleRepository;
+
     @Autowired
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Autowired
+    private ProfilePictureRepository profilePictureRepository;
 
     public TokenResponse signup(UserRegisterForm form) {
         User user =new User();
@@ -120,6 +129,35 @@ public class UserService {
         }
         user.setLastRequest(LocalDateTime.now());
         userRepository.save(user);
+    }
+
+    public ProfilePicture storeFile(MultipartFile file) throws Exception {
+        // Normalize file name
+        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+
+        try {
+            // Check if the file's name contains invalid characters
+            if(fileName.contains("..")) {
+                throw new Exception("Sorry! Filename contains invalid path sequence " + fileName);
+            }
+
+            ProfilePicture dbFile = new ProfilePicture(fileName, file.getContentType(), file.getBytes());
+
+            return profilePictureRepository.save(dbFile);
+        } catch (IOException ex) {
+            throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
+        }
+    }
+
+    public ProfilePicture getFile(Long fileId) {
+        try {
+            return profilePictureRepository.findById(fileId)
+                    .orElseThrow(() -> new Exception("File not found with id " + fileId));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+
     }
 
 }

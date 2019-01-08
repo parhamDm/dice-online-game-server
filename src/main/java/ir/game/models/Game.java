@@ -1,10 +1,10 @@
 package ir.game.models;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
+import java.util.ArrayList;
 
 @Entity
 public class Game {
@@ -12,15 +12,17 @@ public class Game {
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
 
-    @Size(max = 9999)
-    private int scoreLimit;
+    @Max(9999)
+    private Integer scoreLimit;
 
-    private String currentZeroMaker;//numbers 123456
+    private ArrayList<Integer> currentZeroMaker;//numbers 123456
 
-    @Size(max = 4, min=1)
-    private int numberOfDices; //1,2,4
+    private Integer numberOfDices; //1,2,4
 
     private String dicePerTurn;//number or "INF"
+
+    @ManyToOne
+    private User user;
 
     public Long getId() {
         return id;
@@ -38,14 +40,6 @@ public class Game {
         this.scoreLimit = scoreLimit;
     }
 
-    public String getCurrentZeroMaker() {
-        return currentZeroMaker;
-    }
-
-    public void setCurrentZeroMaker(String currentZeroMaker) {
-        this.currentZeroMaker = currentZeroMaker;
-    }
-
     public int getNumberOfDices() {
         return numberOfDices;
     }
@@ -60,5 +54,22 @@ public class Game {
 
     public void setDicePerTurn(String dicePerTurn) {
         this.dicePerTurn = dicePerTurn;
+    }
+
+    public ArrayList<Integer> getCurrentZeroMaker() {
+        return currentZeroMaker;
+    }
+
+    public void setCurrentZeroMaker(ArrayList<Integer> currentZeroMaker) {
+        this.currentZeroMaker = currentZeroMaker;
+    }
+
+    public User getUser() {
+        return user;
+
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 }

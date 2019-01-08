@@ -20,12 +20,17 @@ public class User {
 
     private String lastName;
 
+    private String playedTime;
+
     private LocalDateTime lastRequest;
     @ManyToMany
     private List<User> friends;
 
     @ManyToOne
     private Role role;
+
+    @OneToOne
+    private ProfilePicture profilePicture;
 
     public User() {
     }
@@ -92,5 +97,13 @@ public class User {
 
     public void setLastRequest(LocalDateTime lastRequest) {
         this.lastRequest = lastRequest;
+    }
+
+    public String getPlayedTime() {
+        return playedTime;
+    }
+
+    public void setPlayedTime(String playedTime) {
+        this.playedTime = playedTime;
     }
 }
