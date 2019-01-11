@@ -1,6 +1,7 @@
 package ir.game.models;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 public class GameSession {
@@ -17,9 +18,15 @@ public class GameSession {
     @ManyToOne
     private User player2;
 
+    private LocalDateTime playTime;
+
     private int player1Score;
 
     private int player2Score;
+
+    private String gameStatus; //OVER,CURRENT
+
+    private String winner;
 
     private int player1Current;
 
@@ -87,5 +94,30 @@ public class GameSession {
 
     public void setPlayer2Current(int player2Current) {
         this.player2Current = player2Current;
+    }
+
+    public LocalDateTime getPlayTime() {
+        return playTime;
+    }
+
+    public void setPlayTime(LocalDateTime playTime) {
+        this.playTime = playTime;
+    }
+
+
+    public String getWinner() {
+        return winner;
+    }
+
+    public void setWinner(String winner) {
+        this.winner = winner;
+    }
+
+    public String getGameStatus() {
+        return gameStatus;
+    }
+
+    public void setGameStatus(String gameStatus) {
+        this.gameStatus = gameStatus;
     }
 }

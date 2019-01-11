@@ -30,4 +30,5 @@ public class SwaggerConfig {
                 .tags(new Tag("ping", "Just a ping"))//
                 .genericModelSubstitutes(Optional.class);
     }
+
 }

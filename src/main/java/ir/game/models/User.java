@@ -23,6 +23,11 @@ public class User {
     private String playedTime;
 
     private LocalDateTime lastRequest;
+
+    private Integer plays;
+
+    private Double avgScore;
+
     @ManyToMany
     private List<User> friends;
 
@@ -105,5 +110,29 @@ public class User {
 
     public void setPlayedTime(String playedTime) {
         this.playedTime = playedTime;
+    }
+
+    public ProfilePicture getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(ProfilePicture profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public Integer getPlays() {
+        return plays;
+    }
+
+    public void setPlays(Integer plays) {
+        this.plays = plays;
+    }
+
+    public Double getAvgScore() {
+        return avgScore;
+    }
+
+    public void setAvgScore(Double avgScore) {
+        this.avgScore = avgScore;
     }
 }

@@ -1,11 +1,12 @@
 package ir.game.services;
 
 import ir.game.configuration.JwtTokenProvider;
+import ir.game.models.GameSession;
 import ir.game.models.ProfilePicture;
 import ir.game.models.Role;
 import ir.game.models.User;
-import ir.game.models.beans.TokenResponse;
-import ir.game.models.beans.UserRegisterForm;
+import ir.game.models.beans.*;
+import ir.game.repository.GameSessionRepository;
 import ir.game.repository.ProfilePictureRepository;
 import ir.game.repository.RoleRepository;
 import ir.game.repository.UserRepository;
@@ -15,10 +16,15 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import javax.persistence.*;
+import javax.transaction.Transactional;
 import java.io.IOException;
+import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Service
@@ -34,10 +40,15 @@ public class UserService {
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired
+    GameSessionRepository gameSessionRepository;
+
+    @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ProfilePictureRepository profilePictureRepository;
+    @PersistenceUnit
+    private EntityManagerFactory emf;
 
     public TokenResponse signup(UserRegisterForm form) {
         User user =new User();
@@ -86,6 +97,60 @@ public class UserService {
 
     }
 
+    public User getUserInfo(String username) {
+        User taken = userRepository.findFirstByUsername(username);
+        if(taken!=null){
+            taken.setPassword(null);
+        }
+        return taken;
+    }
+
+    @Transactional
+    public TokenResponse updateProfile(UserRegisterForm form, String username) {
+
+
+        User user = userRepository.findFirstByUsername(username);
+        if(!inNull(form.getFirstName())){
+            user.setFirstName(form.getFirstName());
+        }
+
+        if(!inNull(form.getLastName())){
+            user.setLastName(form.getLastName());
+        }
+
+        if(!inNull(form.getUsername())){
+            if(!username.equals(form.getUsername())) {
+                User taken = userRepository.findFirstByUsername(form.getUsername());
+                if (taken != null) {
+                    TokenResponse tokenResponse = new TokenResponse();
+                    tokenResponse.setErrorMsg("نام کاربری قبلا استفاده شده است");
+                    tokenResponse.setToken("INVALID");
+                    return tokenResponse;
+                }
+            }
+            user.setUsername(form.getUsername());
+        }
+
+        if(!inNull(form.getPassword())){
+            user.setPassword(form.getPassword());
+        }
+
+        try {
+            user.setPassword(getMD5(user.getPassword()));
+
+        } catch (NoSuchAlgorithmException e) {
+            return null;
+        }
+        userRepository.save(user);
+
+        TokenResponse tokenResponse=new TokenResponse();
+        tokenResponse.setRole(user.getRole().getRoleName());
+        tokenResponse.setToken(jwtTokenProvider.createToken(user.getUsername(), "normal-user"));
+        tokenResponse.setUsername(user.getUsername());
+        return tokenResponse;
+    }
+
+
     public TokenResponse login(String username, String password){
         TokenResponse tokenResponse=new TokenResponse();
         String secret="";
@@ -107,6 +172,7 @@ public class UserService {
         }
         String token=jwtTokenProvider.createToken(user.getUsername(), "user");
         tokenResponse.setToken(token);
+        tokenResponse.setUsername(user.getUsername());
         return tokenResponse;
     }
 
@@ -131,9 +197,10 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public ProfilePicture storeFile(MultipartFile file) throws Exception {
+    public User storeFile(MultipartFile file,String username) throws Exception {
         // Normalize file name
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        User user = userRepository.findFirstByUsername(username);
 
         try {
             // Check if the file's name contains invalid characters
@@ -142,22 +209,100 @@ public class UserService {
             }
 
             ProfilePicture dbFile = new ProfilePicture(fileName, file.getContentType(), file.getBytes());
+            profilePictureRepository.save(dbFile);
 
-            return profilePictureRepository.save(dbFile);
+            user.setProfilePicture(dbFile);
+
+            return userRepository.save(user);
         } catch (IOException ex) {
             throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
         }
     }
+    @Transactional
+    public List<UserData> userList(){
+        List<User> users=userRepository.findAll();
+        ArrayList<UserData> al =new ArrayList<>();
 
-    public ProfilePicture getFile(Long fileId) {
+        for (User user:users
+             ) {
+            user.setPassword(null);
+            user.setFriends(null);
+            double score = 0;
+            try {
+                score =this.getUserScore(user.getUsername());
+            }catch (Exception ex){
+                System.out.println("unable to get score data");
+            }
+            al.add(new UserData(user,score));
+            //get number of played games
+            int countOfPlayedGames = gameSessionRepository.findSpecifiedUserGames("OVER",user.getUsername()).size();
+            //get average score
+//            String quer="SELECT AVG ()" +
+//                    "(SELECT gs.player1score sc" +
+//                    "from user u" +
+//                    " JOIN game_session gs on gs.player1_id=u.id " +
+//                    " WHERE gs.game_status='OVER' and u.id =:userId )" +
+//                    "UNION " +
+//                    "(SELECT  gsplayer2score " +
+//                    "from user u" +
+//                    " JOIN game_session gs on gs.player2_id=u.id" +
+//                    " WHERE gs.game_status='OVER' and u.id =:userId)";
+//            System.out.println(quer);
+//            Query q= em.createNativeQuery(quer);
+//            q.setParameter("userId",user.getId());
+//            List authors = q.getResultList();
+        }
+        return al;
+    }
+
+    public ResponseList<?> gamesPlayed(String username){
+        List<GameSession> gameSessions=gameSessionRepository.findSpecifiedUserGames("OVER",username);
+        ArrayList<GameHistory> ghs=new ArrayList<GameHistory>();
+        for (GameSession gs:gameSessions) {
+            GameHistory gh=new GameHistory();
+            String user = gs.getPlayer1().getUsername();
+            if(user.equals(username)){
+                gh.setOpponent(gs.getPlayer2().getUsername());
+            }else{
+                gh.setOpponent(gs.getPlayer1().getUsername());
+            }
+            gh.setComments(gs.getGame().getComments());
+            gh.setDatePlayed(gs.getPlayTime());
+            gh.setWinner(gs.getWinner());
+            ghs.add(gh);
+        }
+        return new ResponseList<GameHistory>(0,"DONE",ghs);
+    }
+
+
+    public ProfilePicture getFile(String username) {
         try {
-            return profilePictureRepository.findById(fileId)
-                    .orElseThrow(() -> new Exception("File not found with id " + fileId));
+            return userRepository.findFirstByUsername(username).getProfilePicture();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
 
+    }
+
+    @Transactional
+    public double getUserScore(String username){
+        EntityManager em = emf.createEntityManager();
+            Query q= em.createQuery("SELECT avg(s.score) from Score s join s.to where " +
+                    "s.to.username = :userId" +
+                    "");
+            q.setParameter("userId",username);
+            Double count = (Double) q.getSingleResult();
+            em.close();
+            if (count ==null) count=0.0;
+            return count;
+    }
+
+    private boolean inNull(String s){
+        if(s==null || s.equals("")){
+            return true;
+        }
+        return false;
     }
 
 }

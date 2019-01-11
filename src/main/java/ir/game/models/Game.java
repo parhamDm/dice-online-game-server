@@ -5,6 +5,7 @@ import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 public class Game {
@@ -21,8 +22,13 @@ public class Game {
 
     private String dicePerTurn;//number or "INF"
 
+    private String username;//number or "INF"
+
     @ManyToOne
     private User user;
+
+    @OneToMany
+    private List<Comment> comments;
 
     public Long getId() {
         return id;
@@ -71,5 +77,21 @@ public class Game {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public List<Comment> getComments() {
+        return comments;
+    }
+
+    public void setComments(List<Comment> comments) {
+        this.comments = comments;
     }
 }

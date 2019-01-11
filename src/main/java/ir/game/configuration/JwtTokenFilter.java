@@ -36,8 +36,9 @@ public class JwtTokenFilter extends GenericFilterBean {
         try {
             filterChain.doFilter(req, res);
         } catch (ServletException e) {
+            e.printStackTrace();
             HttpServletResponse response = (HttpServletResponse) res;
-            response.sendError(403,"unAuth");
+            response.sendError(503,"service unavailable");
         }
     }
 }

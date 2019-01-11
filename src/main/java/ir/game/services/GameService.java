@@ -4,10 +4,13 @@ import ir.game.configuration.JwtTokenProvider;
 import ir.game.models.Game;
 import ir.game.models.User;
 import ir.game.models.beans.ResponseBean;
+import ir.game.models.beans.ResponseList;
 import ir.game.repository.GameRepository;
 import ir.game.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 @Service
 public class GameService {
@@ -31,6 +34,29 @@ public class GameService {
             return  new ResponseBean(-1,"فرمت داده های ورودی نامعتبر است");
         }
         return  new ResponseBean(0,"DONE");
-
     }
+
+
+
+    public ResponseList listOfOwnGames(String username){
+        User user = userRepository.findFirstByUsername(username);
+        if(user==null){
+            return  new ResponseList(-1,"کاربر نامعتبر است",null);
+        }
+        List<Game> games = gameRepository.findAllByUser(user);
+        for (Game game: games){
+            game.setUsername(game.getUser().getUsername());
+            game.setUser(null);
+        }
+        ResponseList<Game> responseList =new ResponseList<Game>(0,"DONE",games);
+        return responseList;
+    }
+
+    public ResponseList listOfAllGames(String username){
+        List<Game> games = gameRepository.findAll();
+        ResponseList<Game> responseList =new ResponseList<Game>(0,"DONE",games);
+        return responseList;
+    }
+
+
 }
