@@ -10,7 +10,9 @@ import ir.game.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class GameService {
@@ -58,5 +60,10 @@ public class GameService {
         return responseList;
     }
 
+    public Game get(Long id){
+        Optional<Game> game;
+        game = gameRepository.findById(id);
+        return game.orElse(null);
+    }
 
 }
