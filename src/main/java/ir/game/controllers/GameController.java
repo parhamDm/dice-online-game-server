@@ -45,6 +45,7 @@ public class GameController {
             return new ResponseEntity<>("GameNotFound",HttpStatus.BAD_REQUEST);
         }
         return new ResponseEntity<Game>(game,HttpStatus.OK);
+
     }
 
     @RequestMapping(path = "/ownGames",method = RequestMethod.GET)
@@ -57,10 +58,8 @@ public class GameController {
 
     @RequestMapping(path = "/AllGames",method = RequestMethod.GET)
     public ResponseEntity<?> getAllGames(ServletRequest req){
-        String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
-        String username=jwtTokenProvider.getUsername(token);
-        ResponseList<Game> responseBean=gameService.listOfOwnGames(username);
-        return new ResponseEntity<ResponseList<Game>>(responseBean,HttpStatus.OK);
+        ResponseList<Game> responseBean=gameService.listOfAllGames();
+        return new ResponseEntity<>(responseBean,HttpStatus.OK);
     }
 
     @RequestMapping(path = "/gamesPlayed",method = RequestMethod.GET)

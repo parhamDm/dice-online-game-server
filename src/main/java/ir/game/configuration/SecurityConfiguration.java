@@ -41,7 +41,7 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter{
                 .antMatchers("/user/login").permitAll()//
                 .antMatchers("/h2-console/**/**").permitAll()
                 .antMatchers("/user/uploadPix").permitAll()
-                .antMatchers("/game/create").hasRole("normal-user")
+                .antMatchers("/game/create").permitAll()
                 .antMatchers(HttpMethod.OPTIONS,"/*").permitAll()
 
                 // Disallow everything else..

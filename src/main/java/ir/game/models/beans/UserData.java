@@ -5,7 +5,7 @@ import ir.game.models.User;
 import java.time.LocalDateTime;
 
 public class UserData {
-    private int totalPlays;
+    private Integer totalPlays;
     private double averageScore;
     private Boolean isOnline;
     private String username;

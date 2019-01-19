@@ -2,7 +2,9 @@ package ir.game.services;
 
 import ir.game.configuration.JwtTokenProvider;
 import ir.game.models.Game;
+import ir.game.models.GameSession;
 import ir.game.models.User;
+import ir.game.models.beans.GameComments;
 import ir.game.models.beans.ResponseBean;
 import ir.game.models.beans.ResponseList;
 import ir.game.repository.GameRepository;
@@ -10,7 +12,12 @@ import ir.game.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
+import javax.persistence.PersistenceUnit;
+import javax.persistence.Query;
 import javax.servlet.http.HttpServletRequest;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -22,6 +29,11 @@ public class GameService {
     UserRepository userRepository;
     @Autowired
     GameRepository gameRepository;
+    @Autowired
+    GameSessionService gameSessionService;
+
+    @PersistenceUnit
+    private EntityManagerFactory emf;
 
     public ResponseBean create(String username, Game game){
         User user = userRepository.findFirstByUsername(username);
@@ -29,6 +41,9 @@ public class GameService {
             return  new ResponseBean(-1,"کاربر نامعتبر است");
         }
         game.setUser(user);
+        game.setTimesPlayed(0);
+        game.setUsername(user.getUsername());
+        game.setDate(LocalDateTime.now());
         try {
             gameRepository.save(game);
 
@@ -54,9 +69,16 @@ public class GameService {
         return responseList;
     }
 
-    public ResponseList listOfAllGames(String username){
+    public ResponseList listOfAllGames(){
+
         List<Game> games = gameRepository.findAll();
+        games.forEach((v)->{
+            v.setUser(null);
+            int number = this.gameSessionService.countPlyingSessins(v.getId());
+            v.setPlayingSessions(number);
+        });
         ResponseList<Game> responseList =new ResponseList<Game>(0,"DONE",games);
+
         return responseList;
     }
 

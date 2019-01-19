@@ -19,7 +19,6 @@ import org.springframework.web.multipart.MultipartFile;
 import javax.persistence.*;
 import javax.transaction.Transactional;
 import java.io.IOException;
-import java.lang.reflect.Array;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
@@ -218,7 +217,7 @@ public class UserService {
             throw new Exception("Could not store file " + fileName + ". Please try again!", ex);
         }
     }
-    @Transactional
+
     public List<UserData> userList(){
         List<User> users=userRepository.findAll();
         ArrayList<UserData> al =new ArrayList<>();
@@ -266,7 +265,7 @@ public class UserService {
             }else{
                 gh.setOpponent(gs.getPlayer1().getUsername());
             }
-            gh.setComments(gs.getGame().getComments());
+            gh.setComments(gs.getGame().getGameComments());
             gh.setDatePlayed(gs.getPlayTime());
             gh.setWinner(gs.getWinner());
             ghs.add(gh);

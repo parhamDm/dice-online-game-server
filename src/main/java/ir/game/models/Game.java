@@ -1,9 +1,10 @@
 package ir.game.models;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import javax.persistence.*;
 import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,15 +21,28 @@ public class Game {
 
     private Integer numberOfDices; //1,2,4
 
-    private String dicePerTurn;//number or "INF"
+    private Integer dicePerTurn;//number or null
 
-    private String username;//number or "INF"
+    private String username;
 
-    @ManyToOne
+    private String gameName;
+
+    private LocalDateTime date;
+
+    private Integer timesPlayed;
+
+    @Transient
+    private int playingSessions;
+
+    @JsonManagedReference
+    @ManyToOne(fetch = FetchType.LAZY)
     private User user;
 
     @OneToMany
-    private List<Comment> comments;
+    private List<GameComment> gameComments;
+
+    public Game() {
+    }
 
     public Long getId() {
         return id;
@@ -54,13 +68,6 @@ public class Game {
         this.numberOfDices = numberOfDices;
     }
 
-    public String getDicePerTurn() {
-        return dicePerTurn;
-    }
-
-    public void setDicePerTurn(String dicePerTurn) {
-        this.dicePerTurn = dicePerTurn;
-    }
 
     public ArrayList<Integer> getCurrentZeroMaker() {
         return currentZeroMaker;
@@ -87,11 +94,51 @@ public class Game {
         this.username = username;
     }
 
-    public List<Comment> getComments() {
-        return comments;
+    public List<GameComment> getGameComments() {
+        return gameComments;
     }
 
-    public void setComments(List<Comment> comments) {
-        this.comments = comments;
+    public void setGameComments(List<GameComment> gameComments) {
+        this.gameComments = gameComments;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
+
+    public Integer getDicePerTurn() {
+        return dicePerTurn;
+    }
+
+    public void setDicePerTurn(Integer dicePerTurn) {
+        this.dicePerTurn = dicePerTurn;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
+    }
+
+    public Integer getTimesPlayed() {
+        return timesPlayed;
+    }
+
+    public void setTimesPlayed(Integer timesPlayed) {
+        this.timesPlayed = timesPlayed;
+    }
+
+    public int getPlayingSessions() {
+        return playingSessions;
+    }
+
+    public void setPlayingSessions(int playingSessions) {
+        this.playingSessions = playingSessions;
     }
 }

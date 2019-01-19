@@ -4,19 +4,27 @@ import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import java.time.LocalDateTime;
 
 @Entity
-public class Score {
+public class UserComment {
 
     @Id
     private Long id;
 
     private Integer score;
 
+    private String comment;
+
     @ManyToOne
     private User from;
+
     @ManyToOne
     private User to;
+
+    private Long status;
+
+    private LocalDateTime date;
 
     public Long getId() {
         return id;
@@ -48,5 +56,29 @@ public class Score {
 
     public void setTo(User to) {
         this.to = to;
+    }
+
+    public String getComment() {
+        return comment;
+    }
+
+    public void setComment(String comment) {
+        this.comment = comment;
+    }
+
+    public Long getStatus() {
+        return status;
+    }
+
+    public void setStatus(Long status) {
+        this.status = status;
+    }
+
+    public LocalDateTime getDate() {
+        return date;
+    }
+
+    public void setDate(LocalDateTime date) {
+        this.date = date;
     }
 }

@@ -192,6 +192,16 @@ public class GameSessionService {
 
     }
 
+    public int countPlyingSessins(Long gameId){
+        final int[] sum = {0};
+        this.games.forEach((v,e)->{
+            if(e.getGameId()==gameId){
+                sum[0]++;
+            }
+        });
+        return sum[0];
+    }
+
     public GameSessionHashMap<String, PlayingSession> getGames() {
         return games;
     }
