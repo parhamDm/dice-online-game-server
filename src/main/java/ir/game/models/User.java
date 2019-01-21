@@ -9,7 +9,6 @@ import java.util.List;
 
 @Entity
 @JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
-
 public class User {
 
     @Id
@@ -29,6 +28,8 @@ public class User {
     private LocalDateTime lastRequest;
 
     private Integer plays;
+
+    private int gamesWon;
 
     private Double avgScore;
 
@@ -138,5 +139,13 @@ public class User {
 
     public void setAvgScore(Double avgScore) {
         this.avgScore = avgScore;
+    }
+
+    public int getGamesWon() {
+        return gamesWon;
+    }
+
+    public void setGamesWon(int gamesWon) {
+        this.gamesWon = gamesWon;
     }
 }

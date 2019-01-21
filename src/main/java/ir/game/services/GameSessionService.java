@@ -1,12 +1,18 @@
 package ir.game.services;
 
+import ir.game.models.Game;
+import ir.game.models.GameFinished;
+import ir.game.models.User;
 import ir.game.models.beans.GameStatusResponse;
 import ir.game.models.session.PlayingSession;
+import ir.game.repository.GameFinishedRepository;
+import ir.game.repository.GameRepository;
 import ir.game.repository.UserRepository;
 import ir.game.util.GameSessionHashMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -15,6 +21,11 @@ public class GameSessionService {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    GameFinishedRepository gameFinishedRepository;
+    @Autowired
+    GameRepository gameRepository;
     @Autowired
     private GameSessionHashMap<String,PlayingSession> games;
 
@@ -55,6 +66,7 @@ public class GameSessionService {
             sum+=roll;
             dices.add(roll);
         }
+        playingSession.setDiceNumber(playingSession.getDiceNumber()+1);
         //current value
         int finalSum = sum;
         final boolean[] status = new boolean[1];
@@ -72,6 +84,7 @@ public class GameSessionService {
             }
 
         });
+
         //update last dice values
         playingSession.setLastDice(0,dices);
 
@@ -81,6 +94,7 @@ public class GameSessionService {
         gameStatusResponse.setOpponentCurrent(playingSession.getCurrents(opponentNum));
         gameStatusResponse.setOpponentScore(playingSession.getScores(opponentNum));
         //courrent == dices
+
         if(status[0]){
             gameStatusResponse.setYourTurn(false);
         }else{
@@ -88,6 +102,12 @@ public class GameSessionService {
             playingSession.setCurrents(userNum,score);
             gameStatusResponse.setCurrent(score);
             gameStatusResponse.setYourTurn(true);
+        }
+
+        //dice limit
+        if(playingSession.getDicePerRound()!=null&&!status[0]&&
+                playingSession.getDicePerRound() <= playingSession.getDiceNumber() ){
+            return hold(username,gameToken);
         }
         gameStatusResponse.setScore(playingSession.getScores(userNum));
         gameStatusResponse.setStatusCode("0");
@@ -102,7 +122,7 @@ public class GameSessionService {
         int userId = Math.toIntExact(userRepository.findFirstByUsername(username).getId());
 
         PlayingSession playingSession=games.get(gameToken);
-
+        playingSession.setDiceNumber(0);
         int userNum;
         int opponentNum;
 
@@ -143,10 +163,10 @@ public class GameSessionService {
         gameStatusResponse.setStatusCode("0");
         gameStatusResponse.setStatusDesc("DONE");
         gameStatusResponse.setDices(playingSession.getLastDice(0));
-
         //winner Status
         if(score+current>=playingSession.getScoreLimit()){
-            gameIsOver(userId,playingSession);
+            gameIsOver((long) userId,playingSession,gameToken);
+            this.games.remove(gameToken);
         }
         return gameStatusResponse;
     }
@@ -158,7 +178,15 @@ public class GameSessionService {
 
         PlayingSession playingSession=games.get(gameToken);
         if(playingSession==null){
-            //find who is winner??
+            GameFinished gameFinished=gameFinishedRepository.findFirstByGameToken(gameToken);
+            if(gameFinished.getWinner().equals(username)){
+                gameStatusResponse.setStatusCode("4");
+                gameStatusResponse.setStatusDesc("won");
+            }else {
+                gameStatusResponse.setStatusCode("5");
+                gameStatusResponse.setStatusDesc("lost");
+            }
+            return gameStatusResponse;
         }
 
         int userNum;
@@ -168,9 +196,11 @@ public class GameSessionService {
         if(userId==playingSession.getP1Id()){
             userNum=0;
             opponentNum=1;
+            gameStatusResponse.setOpponentId(playingSession.getP2Id());
         }else {
             userNum=1;
             opponentNum=0;
+            gameStatusResponse.setOpponentId(playingSession.getP1Id());
         }
         if((userNum==1 && playingSession.getWhosTurn().equals("P1"))
         ||(userNum==0 && playingSession.getWhosTurn().equals("P2"))){
@@ -188,8 +218,31 @@ public class GameSessionService {
 
         return gameStatusResponse;
     }
-    private void gameIsOver(int userId, PlayingSession playingSession) {
 
+    private void gameIsOver(Long userId,PlayingSession playingSession,String gameToken) {
+        User user1=userRepository.findFirstById(playingSession.getP1Id());
+        User user2=userRepository.findFirstById(playingSession.getP2Id());
+        User user3=userRepository.findFirstById(userId);
+        Game game = gameRepository.findById(playingSession.getGameId()).orElse(null);
+        GameFinished gameFinished=new GameFinished();
+        gameFinished.setPlayer1(user1);
+        gameFinished.setPlayer1(user2);
+        gameFinished.setGame(game);
+        gameFinished.setPlayer1Score(playingSession.getScores(0));
+        gameFinished.setPlayer2Score(playingSession.getScores(1));
+        gameFinished.setPlayTime(LocalDateTime.now());
+        gameFinished.setPlayTime(LocalDateTime.now());
+        gameFinished.setWinner(user3.getUsername());
+        gameFinished.setGameToken(gameToken);
+        gameFinishedRepository.save(gameFinished);
+
+        user1.setPlays(user1.getPlays()+1);
+        user2.setPlays(user2.getPlays()+1);
+        userRepository.save(user1);
+        userRepository.save(user2);
+
+        game.setGamesWon(game.getGamesWon()+1);
+        gameRepository.save(game);
     }
 
     public int countPlyingSessins(Long gameId){

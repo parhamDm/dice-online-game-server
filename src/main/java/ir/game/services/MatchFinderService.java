@@ -1,7 +1,6 @@
 package ir.game.services;
 
 import ir.game.models.Game;
-import ir.game.models.GameSession;
 import ir.game.models.User;
 import ir.game.models.beans.ResponseBean;
 import ir.game.models.session.PlayingSession;
@@ -126,9 +125,17 @@ public class MatchFinderService {
         playingSession.setGameId(f.getGameId());
         playingSession.setWhosTurn("P1");
         playingSession.setScoreLimit(game.getScoreLimit());
-        playingSession.setCurrentZeroMaker(al);
+        playingSession.setCurrentZeroMaker(game.getCurrentZeroMaker());
 //        playingSession.setCurrentZeroMaker(game.getCurrentZeroMaker());
         playingSession.setDiceCount(game.getNumberOfDices());
+
+        if(game.getDicePerTurn()==null){
+            playingSession.setDicePerRound(null);
+        }else {
+            playingSession.setDicePerRound(game.getDicePerTurn());
+        }
+
+        playingSession.setDiceNumber(0);
 
         GameSessionHashMap gsm = gameSessionService.getGames();
         gsm.put(gameToken,playingSession);

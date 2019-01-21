@@ -23,6 +23,10 @@ public class PlayingSession {
 
     private ArrayList<Integer>[] lastDice;
 
+    private Integer dicePerRound;
+
+    private Integer diceNumber;
+
     public PlayingSession() {
         lastDice = new ArrayList[2];
         for (int i = 0; i < 2; i++) {
@@ -116,5 +120,21 @@ public class PlayingSession {
 
     public void setLastDice(ArrayList<Integer>[] lastDice) {
         this.lastDice = lastDice;
+    }
+
+    public Integer getDicePerRound() {
+        return dicePerRound;
+    }
+
+    public void setDicePerRound(Integer dicePerRound) {
+        this.dicePerRound = dicePerRound;
+    }
+
+    public Integer getDiceNumber() {
+        return diceNumber;
+    }
+
+    public void setDiceNumber(Integer diceNumber) {
+        this.diceNumber = diceNumber;
     }
 }

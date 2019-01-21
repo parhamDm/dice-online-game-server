@@ -1,15 +1,13 @@
 package ir.game.services;
 
 import ir.game.models.*;
-import ir.game.models.beans.GameComments;
-import ir.game.models.beans.ResponseBean;
-import ir.game.models.beans.ResponseList;
-import ir.game.models.beans.UserComments;
+import ir.game.models.beans.*;
 import ir.game.repository.GameCommentRepository;
 import ir.game.repository.GameRepository;
 import ir.game.repository.UserCommentRepository;
 import ir.game.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.EntityManager;
@@ -121,5 +119,53 @@ public class CommentService {
 
         ResponseList<UserComments> rl=new ResponseList(0,"DONE",gc);
         return rl;
+    }
+
+    public ResponseBean addComment(String username, Comment comment){
+
+        //game
+        GameComment gc=new GameComment();
+        User fromUser=userRepository.findFirstByUsername(username);
+        if (fromUser==null){
+            return new ResponseBean(1,"کاربریافت نشد");
+        }
+        Game game=gameRepository.findById((long) comment.getGameId()).orElse(null);
+        if (game==null){
+            return new ResponseBean(1,"بازی یافت نشد");
+        }
+
+        if(comment.getGameScore()<1||comment.getGameScore()>5){
+            gc.setScore(1);
+        } else {
+            gc.setScore(comment.getGameScore());
+        }
+
+        gc.setStatus(0L);
+        gc.setGame(game);
+        game.getGameComments().add(gc);
+        gc.setComment(comment.getGameComment());
+        gc.setUser(fromUser);
+        gameCommentRepository.save(gc);
+        gameRepository.save(game);
+
+        //userComment
+        UserComment uc=new UserComment();
+        User toUser=userRepository.findFirstById(comment.getToUserId());
+        if (toUser==null){
+            return new ResponseBean(1,"کاربریافت نشد");
+        }
+        if(comment.getGameScore()<1||comment.getGameScore()>5){
+            uc.setScore(1);
+        } else {
+            uc.setScore(comment.getUserScore());
+        }
+        uc.setStatus(0L);
+        uc.setComment(comment.getUserComment());
+        uc.setFrom(fromUser);
+        uc.setTo(toUser);
+
+        userCommentRepository.save(uc);
+
+        return new ResponseBean(0,"DONE");
     }
 }

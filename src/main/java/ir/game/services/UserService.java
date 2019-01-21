@@ -1,12 +1,12 @@
 package ir.game.services;
 
 import ir.game.configuration.JwtTokenProvider;
-import ir.game.models.GameSession;
+import ir.game.models.GameFinished;
 import ir.game.models.ProfilePicture;
 import ir.game.models.Role;
 import ir.game.models.User;
 import ir.game.models.beans.*;
-import ir.game.repository.GameSessionRepository;
+import ir.game.repository.GameFinishedRepository;
 import ir.game.repository.ProfilePictureRepository;
 import ir.game.repository.RoleRepository;
 import ir.game.repository.UserRepository;
@@ -39,7 +39,7 @@ public class UserService {
     JwtTokenProvider jwtTokenProvider;
 
     @Autowired
-    GameSessionRepository gameSessionRepository;
+    GameFinishedRepository gameFinishedRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -55,6 +55,9 @@ public class UserService {
         user.setLastName(form.getLastName());
         user.setUsername(form.getUsername());
         user.setPassword(form.getPassword());
+        user.setAvgScore(0D);
+        user.setPlays(0);
+
         User taken = userRepository.findFirstByUsername(form.getUsername());
         if(taken!=null){
             TokenResponse tokenResponse=new TokenResponse();
@@ -234,7 +237,7 @@ public class UserService {
             }
             al.add(new UserData(user,score));
             //get number of played games
-            int countOfPlayedGames = gameSessionRepository.findSpecifiedUserGames("OVER",user.getUsername()).size();
+            int countOfPlayedGames = gameFinishedRepository.findSpecifiedUserGames(user.getUsername()).size();
             //get average score
 //            String quer="SELECT AVG ()" +
 //                    "(SELECT gs.player1score sc" +
@@ -255,9 +258,9 @@ public class UserService {
     }
 
     public ResponseList<?> gamesPlayed(String username){
-        List<GameSession> gameSessions=gameSessionRepository.findSpecifiedUserGames("OVER",username);
+        List<GameFinished> gameSessions= gameFinishedRepository.findSpecifiedUserGames(username);
         ArrayList<GameHistory> ghs=new ArrayList<GameHistory>();
-        for (GameSession gs:gameSessions) {
+        for (GameFinished gs:gameSessions) {
             GameHistory gh=new GameHistory();
             String user = gs.getPlayer1().getUsername();
             if(user.equals(username)){
@@ -287,9 +290,9 @@ public class UserService {
     @Transactional
     public double getUserScore(String username){
         EntityManager em = emf.createEntityManager();
-            Query q= em.createQuery("SELECT avg(s.score) from Score s join s.to where " +
+            Query q= em.createQuery("SELECT avg(s.score) from UserComment s join s.to where " +
                     "s.to.username = :userId" +
-                    "");
+                    " and s.status   = 1");
             q.setParameter("userId",username);
             Double count = (Double) q.getSingleResult();
             em.close();

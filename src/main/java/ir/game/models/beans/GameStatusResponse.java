@@ -11,6 +11,7 @@ public class GameStatusResponse {
     private int score;
     private int opponentScore;
     private int opponentCurrent;
+    private Long opponentId;
 
 
     private ArrayList<Integer>[] lastDice;
@@ -92,5 +93,13 @@ public class GameStatusResponse {
 
     public void setOpponentCurrent(int opponentCurrent) {
         this.opponentCurrent = opponentCurrent;
+    }
+
+    public Long getOpponentId() {
+        return opponentId;
+    }
+
+    public void setOpponentId(Long opponentId) {
+        this.opponentId = opponentId;
     }
 }

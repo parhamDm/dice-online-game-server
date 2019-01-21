@@ -4,7 +4,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-public class GameSession {
+public class GameFinished {
     @Id
     @GeneratedValue(strategy= GenerationType.AUTO)
     private Long id;
@@ -24,13 +24,9 @@ public class GameSession {
 
     private int player2Score;
 
-    private String gameStatus; //OVER,CURRENT
-
     private String winner;
 
-    private int player1Current;
-
-    private int player2Current;
+    private String gameToken;
 
     public Long getId() {
         return id;
@@ -64,6 +60,14 @@ public class GameSession {
         this.player2 = player2;
     }
 
+    public LocalDateTime getPlayTime() {
+        return playTime;
+    }
+
+    public void setPlayTime(LocalDateTime playTime) {
+        this.playTime = playTime;
+    }
+
     public int getPlayer1Score() {
         return player1Score;
     }
@@ -80,31 +84,6 @@ public class GameSession {
         this.player2Score = player2Score;
     }
 
-    public int getPlayer1Current() {
-        return player1Current;
-    }
-
-    public void setPlayer1Current(int player1Current) {
-        this.player1Current = player1Current;
-    }
-
-    public int getPlayer2Current() {
-        return player2Current;
-    }
-
-    public void setPlayer2Current(int player2Current) {
-        this.player2Current = player2Current;
-    }
-
-    public LocalDateTime getPlayTime() {
-        return playTime;
-    }
-
-    public void setPlayTime(LocalDateTime playTime) {
-        this.playTime = playTime;
-    }
-
-
     public String getWinner() {
         return winner;
     }
@@ -113,11 +92,11 @@ public class GameSession {
         this.winner = winner;
     }
 
-    public String getGameStatus() {
-        return gameStatus;
+    public String getGameToken() {
+        return gameToken;
     }
 
-    public void setGameStatus(String gameStatus) {
-        this.gameStatus = gameStatus;
+    public void setGameToken(String gameToken) {
+        this.gameToken = gameToken;
     }
 }

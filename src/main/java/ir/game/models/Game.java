@@ -29,20 +29,16 @@ public class Game {
 
     private LocalDateTime date;
 
-    private Integer timesPlayed;
+    private Integer gamesWon;
 
     @Transient
     private int playingSessions;
 
-    @JsonManagedReference
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     private User user;
 
     @OneToMany
     private List<GameComment> gameComments;
-
-    public Game() {
-    }
 
     public Long getId() {
         return id;
@@ -52,22 +48,13 @@ public class Game {
         this.id = id;
     }
 
-    public int getScoreLimit() {
+    public Integer getScoreLimit() {
         return scoreLimit;
     }
 
-    public void setScoreLimit(int scoreLimit) {
+    public void setScoreLimit(Integer scoreLimit) {
         this.scoreLimit = scoreLimit;
     }
-
-    public int getNumberOfDices() {
-        return numberOfDices;
-    }
-
-    public void setNumberOfDices(int numberOfDices) {
-        this.numberOfDices = numberOfDices;
-    }
-
 
     public ArrayList<Integer> getCurrentZeroMaker() {
         return currentZeroMaker;
@@ -77,37 +64,12 @@ public class Game {
         this.currentZeroMaker = currentZeroMaker;
     }
 
-    public User getUser() {
-        return user;
-
+    public Integer getNumberOfDices() {
+        return numberOfDices;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
-
-    public String getUsername() {
-        return username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
-    }
-
-    public List<GameComment> getGameComments() {
-        return gameComments;
-    }
-
-    public void setGameComments(List<GameComment> gameComments) {
-        this.gameComments = gameComments;
-    }
-
-    public String getGameName() {
-        return gameName;
-    }
-
-    public void setGameName(String gameName) {
-        this.gameName = gameName;
+    public void setNumberOfDices(Integer numberOfDices) {
+        this.numberOfDices = numberOfDices;
     }
 
     public Integer getDicePerTurn() {
@@ -118,6 +80,22 @@ public class Game {
         this.dicePerTurn = dicePerTurn;
     }
 
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getGameName() {
+        return gameName;
+    }
+
+    public void setGameName(String gameName) {
+        this.gameName = gameName;
+    }
+
     public LocalDateTime getDate() {
         return date;
     }
@@ -126,12 +104,12 @@ public class Game {
         this.date = date;
     }
 
-    public Integer getTimesPlayed() {
-        return timesPlayed;
+    public Integer getGamesWon() {
+        return gamesWon;
     }
 
-    public void setTimesPlayed(Integer timesPlayed) {
-        this.timesPlayed = timesPlayed;
+    public void setGamesWon(Integer gamesWon) {
+        this.gamesWon = gamesWon;
     }
 
     public int getPlayingSessions() {
@@ -140,5 +118,21 @@ public class Game {
 
     public void setPlayingSessions(int playingSessions) {
         this.playingSessions = playingSessions;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
+
+    public List<GameComment> getGameComments() {
+        return gameComments;
+    }
+
+    public void setGameComments(List<GameComment> gameComments) {
+        this.gameComments = gameComments;
     }
 }

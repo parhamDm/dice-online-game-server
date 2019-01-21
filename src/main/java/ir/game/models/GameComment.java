@@ -29,7 +29,7 @@ public class GameComment {
 
     private LocalDateTime date;
 
-    GameComment(){
+    public GameComment(){
         date=LocalDateTime.now();
     }
 

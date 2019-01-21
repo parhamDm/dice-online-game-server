@@ -1,16 +1,13 @@
 package ir.game.models;
 
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
+import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
 public class UserComment {
 
     @Id
-    private Long id;
+    @GeneratedValue(strategy= GenerationType.AUTO)    private Long id;
 
     private Integer score;
 
@@ -25,6 +22,10 @@ public class UserComment {
     private Long status;
 
     private LocalDateTime date;
+
+    public UserComment(){
+        date=LocalDateTime.now();
+    }
 
     public Long getId() {
         return id;

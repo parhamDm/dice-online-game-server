@@ -3,6 +3,7 @@ package ir.game.configuration;
 import ir.game.models.Role;
 import ir.game.models.User;
 import ir.game.repository.UserRepository;
+import ir.game.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -15,8 +16,13 @@ public class UserDetail{
     @Autowired
     private UserRepository userRepository;
 
+    @Autowired
+    private UserService userService;
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         final User user = userRepository.findFirstByUsername(username);
+
+        //update request Value
+        userService.updateLastLoggedIn(username);
 
         if (user == null) {
             throw new UsernameNotFoundException("User '" + username + "' not found");

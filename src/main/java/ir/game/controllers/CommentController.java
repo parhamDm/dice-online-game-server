@@ -2,6 +2,7 @@ package ir.game.controllers;
 
 import ir.game.configuration.JwtTokenProvider;
 import ir.game.models.Game;
+import ir.game.models.beans.Comment;
 import ir.game.models.beans.ResponseBean;
 import ir.game.services.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -64,6 +65,14 @@ public class CommentController {
         String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
         String username=jwtTokenProvider.getUsername(token);
         ResponseBean responseBean=commentService.approveUserComment(username,commentId,status);
+        return new ResponseEntity<ResponseBean>(responseBean,HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/addComment",method = RequestMethod.POST)
+    public ResponseEntity<?> addComment(ServletRequest req, @RequestBody Comment comment){
+        String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
+        String username=jwtTokenProvider.getUsername(token);
+        ResponseBean responseBean=commentService.addComment(username,comment);
         return new ResponseEntity<ResponseBean>(responseBean,HttpStatus.OK);
     }
 }

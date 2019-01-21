@@ -27,7 +27,6 @@ public class JwtTokenProvider {
     @Value("${security.jwt.token.secret-key:secret-key}")
     private String secretKey;
 
-    @Value("${security.jwt.token.expire-length:3600000}")
     private long validityInMilliseconds = 360000000; // 10h
 
     @Autowired
@@ -45,8 +44,7 @@ public class JwtTokenProvider {
 
         Claims claims = Jwts.claims().setSubject(username);
 
-        //update request Value
-        userService.updateLastLoggedIn(username);
+
 
         claims.put("ROLE","ROLE_"+role);
 
