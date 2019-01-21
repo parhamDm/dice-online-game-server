@@ -58,6 +58,16 @@ public class UserController {
         String username=jwtTokenProvider.getUsername(token);
         return new ResponseEntity<>(userService.getUserInfo(username),HttpStatus.OK);
     }
+    @RequestMapping(path = "/sliderUsers",method = RequestMethod.GET)
+    public ResponseEntity<?> sliderUsers(ServletRequest req){
+        String username=null;
+        try {
+            String token = jwtTokenProvider.resolveToken((HttpServletRequest) req);
+            username=jwtTokenProvider.getUsername(token);
+        }catch (Exception ignored){
+        }
+        return new ResponseEntity<>(userService.sliderUsers(username),HttpStatus.OK);
+    }
 
 
     @RequestMapping(path = "/uploadPix",method = RequestMethod.POST)
@@ -94,6 +104,8 @@ public class UserController {
 
         return ResponseEntity.ok()
                 .body(userService.userList());
+
+
     }
 
 

@@ -11,6 +11,7 @@ import ir.game.repository.ProfilePictureRepository;
 import ir.game.repository.RoleRepository;
 import ir.game.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -41,8 +42,6 @@ public class UserService {
     @Autowired
     GameFinishedRepository gameFinishedRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @Autowired
     private ProfilePictureRepository profilePictureRepository;
@@ -152,7 +151,6 @@ public class UserService {
         return tokenResponse;
     }
 
-
     public TokenResponse login(String username, String password){
         TokenResponse tokenResponse=new TokenResponse();
         String secret="";
@@ -190,6 +188,7 @@ public class UserService {
         }
         return sb.toString();
     }
+
     public void updateLastLoggedIn(String username){
         User user = userRepository.findFirstByUsername(username);
         if(user==null){
@@ -276,7 +275,6 @@ public class UserService {
         return new ResponseList<GameHistory>(0,"DONE",ghs);
     }
 
-
     public ProfilePicture getFile(String username) {
         try {
             return userRepository.findFirstByUsername(username).getProfilePicture();
@@ -306,5 +304,30 @@ public class UserService {
         }
         return false;
     }
+
+    public List<UserSlider> sliderUsers(String username){
+        List<User> users=userRepository.findAll();
+        User fromUser=userRepository.findFirstByUsername(username);
+        ArrayList<UserSlider> al =new ArrayList<>();
+        boolean isFriend=false;
+        for (User user:users
+                ) {
+            user.setPassword(null);
+            user.setFriends(null);
+            if(fromUser==user){
+                continue;
+            }
+            if(username!=null){
+                if(fromUser.getFriends()!=null&&fromUser.getFriends().contains(user)){
+                    isFriend=true;
+                }
+            }
+            al.add(new UserSlider(user,isFriend));
+            isFriend=false;
+
+        }
+        return al;
+    }
+
 
 }

@@ -4,6 +4,7 @@ import ir.game.configuration.JwtTokenProvider;
 import ir.game.models.Game;
 import ir.game.models.beans.ResponseBean;
 import ir.game.models.beans.ResponseList;
+import ir.game.models.beans.SliderGame;
 import ir.game.services.GameService;
 import ir.game.services.MatchFinderService;
 import ir.game.services.UserService;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.ServletRequest;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
 
 @RestController
 @RequestMapping("/game")
@@ -85,6 +87,13 @@ public class GameController {
         String username=jwtTokenProvider.getUsername(token);
         ResponseBean responseBean= matchFinderService.statusOfRequest(username);
         return new ResponseEntity<ResponseBean>(responseBean,HttpStatus.OK);
+    }
+
+    @RequestMapping(path = "/getGamesForSlider",method = RequestMethod.GET)
+    public ResponseEntity<?> getGamesForSlider(){
+        List<SliderGame> responseBean= gameService.getGamesForSlider();
+        ResponseList<SliderGame> rb=new ResponseList<>(0,"Good",responseBean);
+        return new ResponseEntity<>(responseBean,HttpStatus.OK);
     }
 
 }
